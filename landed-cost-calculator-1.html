@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>India Export — Landed Cost Calculator</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy:#0D1B2A; --ocean:#1A3A5C; --teal:#0E7C7B; --teal-light:#12A09F;
+  --sand:#F5F0E8; --paper:#FAFAF7; --ink:#1A1A1A; --muted:#6B7280;
+  --border:#E2DDD6; --gold:#C9A84C; --green:#2D7A4F; --red:#C0392B; --white:#FFFFFF;
+  --india-orange:#FF9933; --india-green:#138808;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Space Grotesk',sans-serif;background:var(--paper);color:var(--ink);min-height:100vh}
+
+/* HEADER */
+header{background:var(--navy);color:var(--white);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:60px;position:sticky;top:0;z-index:100;border-bottom:3px solid var(--teal)}
+.logo{display:flex;align-items:center;gap:10px;font-size:1.1rem;font-weight:700;letter-spacing:-0.02em}
+.logo-icon{width:34px;height:34px;background:linear-gradient(135deg,var(--india-orange),var(--india-green));border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:1rem}
+.logo span{color:var(--teal-light)}
+header nav{font-size:0.72rem;color:rgba(255,255,255,0.45);font-family:'DM Mono',monospace;letter-spacing:0.06em;text-align:right}
+
+/* HERO */
+.hero{background:linear-gradient(135deg,var(--navy) 0%,#0A2A44 100%);color:var(--white);padding:3rem 2rem 2.5rem;text-align:center;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background-image:radial-gradient(circle at 20% 50%,rgba(255,153,51,0.06) 0%,transparent 50%),radial-gradient(circle at 80% 50%,rgba(19,136,8,0.06) 0%,transparent 50%)}
+.hero-tag{display:inline-block;background:rgba(14,124,123,0.25);border:1px solid var(--teal);color:var(--teal-light);font-family:'DM Mono',monospace;font-size:0.68rem;letter-spacing:0.12em;padding:4px 14px;border-radius:20px;margin-bottom:1rem;text-transform:uppercase;position:relative}
+.hero h1{font-size:clamp(1.6rem,4vw,2.6rem);font-weight:700;letter-spacing:-0.03em;line-height:1.1;margin-bottom:0.7rem;position:relative}
+.hero h1 em{font-style:normal;color:var(--teal-light)}
+.hero p{font-size:0.92rem;color:rgba(255,255,255,0.6);max-width:520px;margin:0 auto;line-height:1.6;position:relative}
+.india-badge{display:inline-flex;align-items:center;gap:6px;margin-top:1rem;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:20px;padding:5px 14px;font-size:0.78rem;color:rgba(255,255,255,0.7)}
+
+/* LAYOUT */
+.container{max-width:1140px;margin:0 auto;padding:2rem 1.5rem 4rem;display:grid;grid-template-columns:1fr 1fr;gap:1.8rem;align-items:start}
+@media(max-width:780px){.container{grid-template-columns:1fr}}
+
+/* CARDS */
+.card{background:var(--white);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:1.4rem}
+.card-header{background:var(--sand);padding:.9rem 1.4rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.card-header .step{width:24px;height:24px;background:var(--navy);color:var(--white);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:700;font-family:'DM Mono',monospace;flex-shrink:0}
+.card-header h2{font-size:0.88rem;font-weight:600;color:var(--navy)}
+.card-header .badge{margin-left:auto;background:rgba(14,124,123,0.12);color:var(--teal);font-size:0.65rem;font-weight:700;letter-spacing:0.06em;padding:3px 8px;border-radius:10px;font-family:'DM Mono',monospace}
+.card-body{padding:1.3rem 1.4rem}
+
+/* FORM */
+.field{margin-bottom:1.1rem}
+label{display:block;font-size:0.75rem;font-weight:600;color:var(--muted);letter-spacing:0.05em;text-transform:uppercase;margin-bottom:5px}
+label .hint{font-weight:400;text-transform:none;letter-spacing:0;font-family:'DM Mono',monospace;font-size:0.7rem;margin-left:6px}
+input[type="number"],input[type="text"],select{width:100%;padding:9px 13px;border:1.5px solid var(--border);border-radius:8px;font-family:'DM Mono',monospace;font-size:0.92rem;color:var(--ink);background:var(--paper);transition:border-color .15s,box-shadow .15s;appearance:none;-webkit-appearance:none}
+input:focus,select:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(14,124,123,0.12);background:var(--white)}
+.input-group{display:flex;align-items:stretch}
+.input-group .prefix,.input-group .suffix{background:var(--sand);border:1.5px solid var(--border);padding:9px 11px;font-size:0.82rem;font-family:'DM Mono',monospace;color:var(--muted);font-weight:500;white-space:nowrap}
+.input-group .prefix{border-right:none;border-radius:8px 0 0 8px}
+.input-group .suffix{border-left:none;border-radius:0 8px 8px 0}
+.input-group input{border-radius:0;flex:1;min-width:0}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:36px;cursor:pointer}
+.row-2{display:grid;grid-template-columns:1fr 1fr;gap:.9rem}
+
+/* PORT SELECTOR */
+.port-route-box{background:var(--paper);border:1.5px solid var(--border);border-radius:10px;padding:1rem;margin-bottom:1rem}
+.port-route-title{font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;font-weight:700;color:var(--muted);margin-bottom:0.8rem}
+.port-route-inner{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.port-select-wrap{flex:1;min-width:120px}
+.port-arrow{color:var(--teal);font-size:1.2rem;font-weight:700;flex-shrink:0}
+.port-info{font-family:'DM Mono',monospace;font-size:0.68rem;color:var(--muted);margin-top:6px;line-height:1.4}
+.port-tag{display:inline-block;background:rgba(14,124,123,0.1);color:var(--teal);border-radius:4px;padding:1px 6px;font-size:0.65rem;font-weight:600;margin-left:4px;font-family:'DM Mono',monospace}
+
+/* DEST BUTTONS */
+.dest-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.6rem;margin-bottom:.9rem}
+.dest-btn{border:2px solid var(--border);border-radius:10px;padding:.65rem .8rem;background:var(--paper);cursor:pointer;display:flex;align-items:center;gap:8px;font-family:'Space Grotesk',sans-serif;font-size:0.83rem;font-weight:500;color:var(--ink);transition:all .15s;text-align:left}
+.dest-btn:hover{border-color:var(--teal);background:var(--white)}
+.dest-btn.active{border-color:var(--teal);background:rgba(14,124,123,0.07);color:var(--teal);font-weight:600}
+.dest-btn .flag{font-size:1.3rem;flex-shrink:0}
+.dest-name{display:block;font-size:0.8rem;font-weight:600}
+.dest-sub{display:block;font-size:0.65rem;color:var(--muted);font-family:'DM Mono',monospace}
+
+/* FREIGHT BUTTONS */
+.freight-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.5rem;margin-bottom:.9rem}
+.freight-btn{border:2px solid var(--border);border-radius:9px;padding:.7rem .4rem;background:var(--paper);cursor:pointer;text-align:center;font-family:'Space Grotesk',sans-serif;transition:all .15s}
+.freight-btn:hover{border-color:var(--teal);background:var(--white)}
+.freight-btn.active{border-color:var(--teal);background:rgba(14,124,123,0.07)}
+.freight-icon{font-size:1.2rem;display:block;margin-bottom:3px}
+.freight-name{font-size:0.75rem;font-weight:600;color:var(--ink);display:block}
+.freight-desc{font-size:0.62rem;color:var(--muted);font-family:'DM Mono',monospace;display:block;margin-top:2px}
+
+/* HSN LOOKUP */
+.hsn-box{background:var(--paper);border:1.5px solid var(--border);border-radius:10px;padding:1rem;margin-bottom:1rem}
+.hsn-result{margin-top:.8rem;padding:.8rem;background:rgba(14,124,123,0.07);border:1px solid rgba(14,124,123,0.2);border-radius:8px;font-size:0.8rem;line-height:1.5;display:none}
+.hsn-result.show{display:block}
+.hsn-result .hsn-label{font-size:0.68rem;text-transform:uppercase;letter-spacing:0.07em;font-weight:700;color:var(--teal);margin-bottom:4px}
+.hsn-duty-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-top:8px}
+.hsn-duty-item{background:var(--white);border-radius:6px;padding:6px 8px}
+.hsn-duty-flag{font-size:0.9rem}
+.hsn-duty-name{font-size:0.68rem;font-weight:600;color:var(--muted)}
+.hsn-duty-val{font-family:'DM Mono',monospace;font-size:0.88rem;font-weight:500;color:var(--ink)}
+.hsn-duty-note{font-size:0.62rem;color:var(--muted)}
+
+/* INCOTERM */
+.incoterm-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem}
+.inco-btn{border:2px solid var(--border);border-radius:8px;padding:.55rem .4rem;background:var(--paper);cursor:pointer;text-align:center;font-family:'Space Grotesk',sans-serif;transition:all .15s}
+.inco-btn:hover{border-color:var(--teal);background:var(--white)}
+.inco-btn.active{border-color:var(--teal);background:rgba(14,124,123,0.07)}
+.inco-code{display:block;font-family:'DM Mono',monospace;font-size:0.85rem;font-weight:500;color:var(--teal)}
+.inco-desc{display:block;font-size:0.62rem;color:var(--muted);margin-top:2px}
+.inco-explainer{margin-top:.8rem;padding:.7rem .9rem;background:var(--paper);border-radius:8px;font-size:0.77rem;color:var(--muted);border:1px solid var(--border);line-height:1.5}
+
+/* SECTION DIVIDER */
+.sdiv{font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;font-weight:700;color:var(--muted);margin:1.2rem 0 .8rem;display:flex;align-items:center;gap:10px}
+.sdiv::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* CALC BUTTON */
+.btn-calc{width:100%;padding:13px;background:var(--teal);color:var(--white);border:none;border-radius:10px;font-family:'Space Grotesk',sans-serif;font-size:.97rem;font-weight:600;cursor:pointer;letter-spacing:-0.01em;transition:background .15s,transform .1s;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:.5rem}
+.btn-calc:hover{background:var(--teal-light)}
+.btn-calc:active{transform:scale(0.99)}
+
+/* RESULTS */
+#results-panel{display:none;grid-column:1/-1}
+#results-panel.visible{display:block}
+.results-header{background:var(--navy);color:var(--white);padding:1.2rem 1.5rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.8rem}
+.results-header h2{font-size:.95rem;font-weight:600;letter-spacing:-0.01em}
+.results-meta{font-family:'DM Mono',monospace;font-size:0.7rem;color:rgba(255,255,255,0.45);margin-top:3px}
+.breakdown{padding:1.4rem 1.5rem}
+
+/* SUMMARY CARDS */
+.summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:.9rem;margin-bottom:1.4rem}
+.cost-item{background:var(--paper);border:1px solid var(--border);border-radius:10px;padding:.9rem 1rem}
+.ci-label{font-size:0.7rem;text-transform:uppercase;letter-spacing:0.06em;font-weight:600;color:var(--muted);margin-bottom:5px}
+.ci-value{font-family:'DM Mono',monospace;font-size:1.15rem;font-weight:500;color:var(--ink)}
+.ci-pct{font-size:0.7rem;color:var(--muted);margin-top:2px;font-family:'DM Mono',monospace}
+.cost-item.highlight{background:var(--navy);border-color:var(--navy)}
+.cost-item.highlight .ci-label{color:rgba(255,255,255,0.55)}
+.cost-item.highlight .ci-value{color:var(--teal-light);font-size:1.55rem;font-weight:700}
+.cost-item.highlight .ci-pct{color:rgba(255,255,255,0.4)}
+
+/* PORT MAP */
+.port-map-bar{background:linear-gradient(90deg,rgba(14,124,123,0.12),rgba(14,124,123,0.04));border:1px solid rgba(14,124,123,0.2);border-radius:10px;padding:1rem 1.2rem;margin-bottom:1.2rem;display:flex;align-items:center;gap:0;overflow-x:auto}
+.pm-node{text-align:center;flex-shrink:0}
+.pm-icon{font-size:1.3rem}
+.pm-name{font-size:0.7rem;font-weight:600;color:var(--navy);margin-top:3px}
+.pm-sub{font-size:0.6rem;color:var(--muted);font-family:'DM Mono',monospace}
+.pm-line{flex:1;min-width:30px;display:flex;flex-direction:column;align-items:center;gap:3px;padding:0 6px}
+.pm-dashes{width:100%;height:2px;background:repeating-linear-gradient(90deg,var(--teal) 0,var(--teal) 6px,transparent 6px,transparent 12px)}
+.pm-line-label{font-size:0.62rem;color:var(--teal);font-family:'DM Mono',monospace;white-space:nowrap}
+
+/* BREAKDOWN TABLE */
+.breakdown-table{border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:1rem}
+.bt-row{display:grid;grid-template-columns:2.2fr 1fr 1fr 0.8fr;align-items:center;padding:.7rem 1rem;border-bottom:1px solid var(--border);font-size:0.83rem}
+.bt-row:last-child{border-bottom:none}
+.bt-row.bh{background:var(--sand);font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--muted)}
+.bt-row.bt{background:var(--navy);color:var(--white);font-weight:700}
+.bt-row.bt .mono{color:var(--teal-light)}
+.bt-row.section-row{background:rgba(14,124,123,0.04);font-weight:600;color:var(--navy);font-size:0.75rem;text-transform:uppercase;letter-spacing:0.04em}
+.mono{font-family:'DM Mono',monospace;font-size:0.85rem}
+.tr{text-align:right}
+.mini-bar{height:5px;background:var(--border);border-radius:3px;overflow:hidden}
+.mini-bar-fill{height:100%;background:var(--teal);border-radius:3px;transition:width .5s ease}
+.bar-col{padding:0 6px}
+.green-val{color:var(--green);font-weight:600}
+.red-val{color:var(--red)}
+
+/* GSP BADGE */
+.gsp-badge{display:inline-flex;align-items:center;gap:4px;background:rgba(45,122,79,0.1);border:1px solid rgba(45,122,79,0.3);color:var(--green);font-size:0.68rem;font-weight:700;padding:3px 8px;border-radius:20px;font-family:'DM Mono',monospace;margin-left:6px}
+
+/* DUTY TABLE */
+.duty-table{border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:1rem}
+.dt-row{display:grid;grid-template-columns:1.5fr 0.8fr 0.8fr 0.8fr 1.2fr;align-items:center;padding:.65rem 1rem;border-bottom:1px solid var(--border);font-size:0.8rem}
+.dt-row:last-child{border-bottom:none}
+.dt-row.dh{background:var(--sand);font-size:0.67rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--muted)}
+
+/* DISCLAIMER */
+.disclaimer{background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.3);border-radius:8px;padding:.9rem 1rem;font-size:0.76rem;color:#7A6020;line-height:1.5;display:flex;gap:8px}
+.disclaimer .dicon{flex-shrink:0;font-size:1rem}
+
+/* TRANSIT BOX */
+.transit-box{background:var(--paper);border:1px solid var(--border);border-radius:8px;padding:.8rem 1rem;margin-bottom:1rem;font-size:0.8rem}
+.transit-box h4{font-size:0.68rem;text-transform:uppercase;letter-spacing:0.08em;font-weight:700;color:var(--muted);margin-bottom:.5rem}
+.transit-row{display:flex;justify-content:space-between;align-items:center;padding:3px 0;border-bottom:1px solid var(--border)}
+.transit-row:last-child{border-bottom:none}
+.transit-row span:first-child{color:var(--muted)}
+.transit-row span:last-child{font-family:'DM Mono',monospace;font-weight:500;color:var(--navy)}
+
+@media(max-width:500px){.bt-row,.dt-row{grid-template-columns:1fr 1fr}.bt-row .bar-col,.bt-row>:nth-child(3),.dt-row>:nth-child(3),.dt-row>:nth-child(4){display:none}.freight-grid{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">🇮🇳</div>
+    India<span>Export</span>&nbsp;· Landed Cost
+  </div>
+  <nav>PORT-TO-PORT · HSN DUTY CALCULATOR<br>FOR INDIAN EXPORTERS</nav>
+</header>
+
+<div class="hero">
+  <div class="hero-tag">🚢 India Export Tool</div>
+  <h1>Know your <em>true landed cost</em><br>before you quote your buyer</h1>
+  <p>Port-to-port sea freight estimates from India's major ports. HSN-code based import duties for EU, UAE, USA & Bangladesh.</p>
+  <div class="india-badge">🇮🇳 Exporter Origin: India only &nbsp;·&nbsp; Rates updated 2024–25</div>
+</div>
+
+<div class="container">
+
+<!-- ══ LEFT COLUMN ══════════════════════════════════ -->
+<div>
+
+  <!-- STEP 1: Product & HSN -->
+  <div class="card">
+    <div class="card-header">
+      <div class="step">1</div>
+      <h2>Product & HSN Code</h2>
+      <span class="badge">DUTY LOOKUP</span>
+    </div>
+    <div class="card-body">
+      <div class="field">
+        <label>Product Description</label>
+        <input type="text" id="product" placeholder="e.g. Cotton T-Shirts, Basmati Rice, Leather Bags…">
+      </div>
+      <div class="hsn-box">
+        <div class="field" style="margin-bottom:0">
+          <label>HSN Code <span class="hint">4 or 6 digit — auto-fills duty rates</span></label>
+          <div style="display:flex;gap:8px">
+            <input type="text" id="hsn_code" placeholder="e.g. 6109, 6109.10, 1006.30" maxlength="10" style="flex:1">
+            <button onclick="lookupHSN()" style="padding:9px 16px;background:var(--teal);color:white;border:none;border-radius:8px;font-family:'Space Grotesk',sans-serif;font-size:0.82rem;font-weight:600;cursor:pointer;white-space:nowrap">Look up</button>
+          </div>
+        </div>
+        <div id="hsn-result" class="hsn-result">
+          <div class="hsn-label" id="hsn-chapter-label"></div>
+          <div id="hsn-desc" style="font-weight:600;color:var(--navy);margin-bottom:4px"></div>
+          <div style="font-size:0.72rem;color:var(--muted);margin-bottom:8px" id="hsn-notes"></div>
+          <div class="hsn-duty-grid" id="hsn-duty-grid"></div>
+        </div>
+      </div>
+
+      <div class="row-2">
+        <div class="field">
+          <label>Currency</label>
+          <select id="currency">
+            <option value="USD">USD – US Dollar</option>
+            <option value="EUR">EUR – Euro</option>
+            <option value="INR">INR – Indian Rupee</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>FOB Value <span class="hint">total</span></label>
+          <div class="input-group">
+            <span class="prefix" id="cur-prefix">$</span>
+            <input type="number" id="fob_value" placeholder="10000" min="0">
+          </div>
+        </div>
+      </div>
+      <div class="row-2">
+        <div class="field">
+          <label>Gross Weight <span class="hint">kg</span></label>
+          <input type="number" id="weight" placeholder="500" min="0">
+        </div>
+        <div class="field">
+          <label>Volume <span class="hint">CBM</span></label>
+          <input type="number" id="volume" placeholder="2.5" step="0.1" min="0">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 2: Incoterms -->
+  <div class="card">
+    <div class="card-header"><div class="step">2</div><h2>Incoterms</h2></div>
+    <div class="card-body">
+      <div class="incoterm-grid" id="incoterm-grid">
+        <button class="inco-btn" data-inco="EXW" onclick="selInco(this)"><span class="inco-code">EXW</span><span class="inco-desc">Ex Works</span></button>
+        <button class="inco-btn active" data-inco="FOB" onclick="selInco(this)"><span class="inco-code">FOB</span><span class="inco-desc">Free on Board</span></button>
+        <button class="inco-btn" data-inco="CIF" onclick="selInco(this)"><span class="inco-code">CIF</span><span class="inco-desc">Cost, Ins & Freight</span></button>
+        <button class="inco-btn" data-inco="CFR" onclick="selInco(this)"><span class="inco-code">CFR</span><span class="inco-desc">Cost & Freight</span></button>
+        <button class="inco-btn" data-inco="DDP" onclick="selInco(this)"><span class="inco-code">DDP</span><span class="inco-desc">Delivery Duty Paid</span></button>
+        <button class="inco-btn" data-inco="FCA" onclick="selInco(this)"><span class="inco-code">FCA</span><span class="inco-desc">Free Carrier</span></button>
+      </div>
+      <div class="inco-explainer" id="inco-explainer"></div>
+    </div>
+  </div>
+
+</div><!-- end left -->
+
+<!-- ══ RIGHT COLUMN ══════════════════════════════════ -->
+<div>
+
+  <!-- STEP 3: Port Route -->
+  <div class="card">
+    <div class="card-header"><div class="step">3</div><h2>Port-to-Port Route</h2><span class="badge">SEA FREIGHT</span></div>
+    <div class="card-body">
+      <div class="port-route-box">
+        <div class="port-route-title">Origin Port (India) → Destination Port</div>
+        <div class="port-route-inner">
+          <div class="port-select-wrap">
+            <select id="origin_port" onchange="updatePortInfo()">
+              <optgroup label="West Coast India">
+                <option value="INNSA">Nhava Sheva (JNPT), Mumbai</option>
+                <option value="INMUN">Mumbai Port</option>
+                <option value="INKAK">Kandla / Deendayal Port</option>
+                <option value="INMUN2">Mundra Port (Gujarat)</option>
+                <option value="INPAV">Pipavav Port (Gujarat)</option>
+                <option value="INCOK">Cochin (Kochi) Port</option>
+                <option value="INMRM">Mormugao (Goa)</option>
+                <option value="INMAN">Mangalore / NMPT</option>
+              </optgroup>
+              <optgroup label="East Coast India">
+                <option value="INCHE">Chennai Port</option>
+                <option value="INENR">Ennore / Kamarajar Port</option>
+                <option value="INTUT">Tuticorin / V.O.C. Port</option>
+                <option value="INVIZ">Visakhapatnam Port</option>
+                <option value="INPRD">Paradip Port (Odisha)</option>
+                <option value="INHAL">Haldia / Kolkata Port</option>
+              </optgroup>
+            </select>
+          </div>
+          <div class="port-arrow">→</div>
+          <div class="port-select-wrap">
+            <select id="dest_port" onchange="updatePortInfo()">
+              <option value="" disabled>— Select destination —</option>
+            </select>
+          </div>
+        </div>
+        <div class="port-info" id="port-info">Select origin and destination ports</div>
+      </div>
+
+      <!-- Destination Market -->
+      <label style="margin-bottom:6px">Buyer's Country</label>
+      <div class="dest-grid" id="dest-grid">
+        <button class="dest-btn active" data-dest="EU" onclick="selDest(this)">
+          <span class="flag">🇪🇺</span><div><span class="dest-name">European Union</span><span class="dest-sub">Germany, Netherlands, France…</span></div>
+        </button>
+        <button class="dest-btn" data-dest="UAE" onclick="selDest(this)">
+          <span class="flag">🇦🇪</span><div><span class="dest-name">UAE</span><span class="dest-sub">Dubai (Jebel Ali), Abu Dhabi</span></div>
+        </button>
+        <button class="dest-btn" data-dest="USA" onclick="selDest(this)">
+          <span class="flag">🇺🇸</span><div><span class="dest-name">United States</span><span class="dest-sub">LA, New York, Savannah…</span></div>
+        </button>
+        <button class="dest-btn" data-dest="BD" onclick="selDest(this)">
+          <span class="flag">🇧🇩</span><div><span class="dest-name">Bangladesh</span><span class="dest-sub">Chittagong Port</span></div>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 4: Freight Type & Costs -->
+  <div class="card">
+    <div class="card-header"><div class="step">4</div><h2>Freight Type & Additional Costs</h2></div>
+    <div class="card-body">
+      <div class="freight-grid" id="freight-grid">
+        <button class="freight-btn active" data-freight="fcl20" onclick="selFreight(this)">
+          <span class="freight-icon">🚢</span><span class="freight-name">FCL 20'</span><span class="freight-desc">Full container</span>
+        </button>
+        <button class="freight-btn" data-freight="fcl40" onclick="selFreight(this)">
+          <span class="freight-icon">🛳</span><span class="freight-name">FCL 40'</span><span class="freight-desc">Large / HC</span>
+        </button>
+        <button class="freight-btn" data-freight="lcl" onclick="selFreight(this)">
+          <span class="freight-icon">📦</span><span class="freight-name">LCL</span><span class="freight-desc">Per CBM</span>
+        </button>
+        <button class="freight-btn" data-freight="air" onclick="selFreight(this)">
+          <span class="freight-icon">✈️</span><span class="freight-name">Air</span><span class="freight-desc">Per kg</span>
+        </button>
+      </div>
+
+      <div class="row-2">
+        <div class="field">
+          <label>Custom Freight <span class="hint">override</span></label>
+          <div class="input-group"><span class="prefix">$</span><input type="number" id="custom_freight" placeholder="auto-estimated" min="0"></div>
+        </div>
+        <div class="field">
+          <label>Custom Duty % <span class="hint">override HSN</span></label>
+          <div class="input-group"><input type="number" id="custom_duty" placeholder="from HSN" min="0" max="200" step="0.1"><span class="suffix">%</span></div>
+        </div>
+      </div>
+
+      <div class="sdiv">Origin Charges (India)</div>
+      <div class="row-2">
+        <div class="field">
+          <label>Export Customs / CHA</label>
+          <div class="input-group"><span class="prefix">$</span><input type="number" id="export_customs" value="200" min="0"></div>
+        </div>
+        <div class="field">
+          <label>Origin THC</label>
+          <div class="input-group"><span class="prefix">$</span><input type="number" id="thc_origin" value="150" min="0"></div>
+        </div>
+      </div>
+      <div class="row-2">
+        <div class="field">
+          <label>Documentation (BL, etc.)</label>
+          <div class="input-group"><span class="prefix">$</span><input type="number" id="doc_fees" value="100" min="0"></div>
+        </div>
+        <div class="field">
+          <label>Marine Insurance <span class="hint">% CIF</span></label>
+          <div class="input-group"><input type="number" id="insurance_pct" value="0.3" step="0.05" min="0"><span class="suffix">%</span></div>
+        </div>
+      </div>
+
+      <div class="sdiv">Destination Charges</div>
+      <div class="row-2">
+        <div class="field">
+          <label>Dest. THC / Port Handling</label>
+          <div class="input-group"><span class="prefix">$</span><input type="number" id="dest_thc" value="" placeholder="auto" min="0"></div>
+        </div>
+        <div class="field">
+          <label>Import Customs Broker</label>
+          <div class="input-group"><span class="prefix">$</span><input type="number" id="dest_customs" value="" placeholder="auto" min="0"></div>
+        </div>
+      </div>
+
+      <button class="btn-calc" onclick="calculate()">🧮 &nbsp;Calculate Landed Cost</button>
+    </div>
+  </div>
+
+</div><!-- end right -->
+
+<!-- ══ RESULTS (full width) ══════════════════════════ -->
+<div id="results-panel">
+  <div class="card">
+    <div class="results-header">
+      <div>
+        <h2 id="res-title">Estimated Landed Cost — India Export</h2>
+        <div class="results-meta" id="res-meta"></div>
+      </div>
+      <div style="font-family:'DM Mono',monospace;font-size:0.68rem;color:rgba(255,255,255,0.35);text-align:right">For planning only<br>Verify with freight forwarder</div>
+    </div>
+    <div class="breakdown">
+      <!-- Port map -->
+      <div class="port-map-bar" id="port-map-bar"></div>
+      <!-- Summary cards -->
+      <div class="summary-grid" id="summary-cards"></div>
+      <!-- Main breakdown table -->
+      <div class="breakdown-table" id="breakdown-table"></div>
+      <!-- Duty detail table -->
+      <div id="duty-detail-box"></div>
+      <!-- Transit info -->
+      <div class="transit-box" id="transit-box"></div>
+      <!-- Disclaimer -->
+      <div class="disclaimer">
+        <span class="dicon">⚠️</span>
+        <span><strong>Estimates for planning only.</strong> Freight rates shown are market averages (2024-25) and vary by carrier, season, and contract. HSN duty rates are standard MFN/GSP rates — verify with your customs broker or check ICEGATE / official tariff schedules before quoting. India-EU FTEPA (FTA) negotiations ongoing; rates may change.</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- end container -->
+
+<script>
+// ══════════════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════════════
+let selDestKey = 'EU';
+let selFreightKey = 'fcl20';
+let selIncoKey = 'FOB';
+let currentHSNData = null;
+
+// ══════════════════════════════════════════════════════════
+// DESTINATION DATA
+// ══════════════════════════════════════════════════════════
+const DEST = {
+  EU: {
+    name:'European Union', flag:'🇪🇺', currency:'EUR',
+    ports:['Rotterdam (Netherlands)','Hamburg (Germany)','Antwerp (Belgium)','Felixstowe (UK)','Le Havre (France)'],
+    vat:21, defaultDestTHC:480, defaultCustBkr:420,
+    transitDays:{ INNSA:22, INMUN:24, INKAK:24, INMUN2:22, INPAV:23, INCOK:20, INMRM:22, INMAN:22, INCHE:20, INENR:20, INTUT:22, INVIZ:22, INPRD:24, INHAL:26 },
+    note:'EU Common External Tariff (CET). India benefits from EU GSP (standard). Bangladesh gets 0% under EBA.',
+    gspNote:'India-EU FTA under negotiation (TEPA). GSP applies — reduced rates for many goods.',
+  },
+  UAE: {
+    name:'United Arab Emirates', flag:'🇦🇪', currency:'AED',
+    ports:['Jebel Ali (Dubai)','Port Rashid (Dubai)','Khalifa Port (Abu Dhabi)','Sharjah Port'],
+    vat:5, defaultDestTHC:280, defaultCustBkr:320,
+    transitDays:{ INNSA:10, INMUN:11, INKAK:8, INMUN2:7, INPAV:8, INCOK:12, INMRM:11, INMAN:12, INCHE:14, INENR:14, INTUT:14, INVIZ:15, INPRD:16, INHAL:18 },
+    note:'GCC flat 5% duty on most goods. India-UAE CEPA (2022) gives India 0% or reduced duty on thousands of tariff lines.',
+    gspNote:'India-UAE CEPA signed Feb 2022: zero duty on 97%+ Indian goods within 5 years. Major advantage for Indian exporters.',
+  },
+  USA: {
+    name:'United States', flag:'🇺🇸', currency:'USD',
+    ports:['Los Angeles / Long Beach','New York / New Jersey','Savannah (Georgia)','Houston (Texas)','Seattle / Tacoma'],
+    vat:0, defaultDestTHC:580, defaultCustBkr:500,
+    transitDays:{ INNSA:28, INMUN:29, INKAK:27, INMUN2:27, INPAV:28, INCOK:26, INMRM:28, INMAN:28, INCHE:25, INENR:25, INTUT:26, INVIZ:26, INPRD:28, INHAL:30 },
+    note:'US MFN tariff. India lost GSP status (2019, not renewed). MPF 0.3464% (min $27.75, max $538.40) + HMT 0.125%.',
+    gspNote:'India GSP benefits were withdrawn by the USA in June 2019. Standard MFN rates apply. No India-US FTA in force.',
+  },
+  BD: {
+    name:'Bangladesh', flag:'🇧🇩', currency:'BDT',
+    ports:['Chittagong Port','Mongla Port'],
+    vat:15, defaultDestTHC:240, defaultCustBkr:280,
+    transitDays:{ INNSA:14, INMUN:15, INKAK:13, INMUN2:13, INPAV:14, INCOK:16, INMRM:15, INMAN:15, INCHE:12, INENR:12, INTUT:13, INVIZ:11, INPRD:10, INHAL:8 },
+    note:'Bangladesh applies CD + RD + SD + VAT(15%) + AIT(5%). Multi-layer tariff. SAPTA / SAFTA gives India some preference.',
+    gspNote:'Under SAFTA India gets preferential rates, but Bangladesh has a sensitive list. Effective burden often 30–60%+.',
+  },
+};
+
+// ══════════════════════════════════════════════════════════
+// PORT-TO-PORT FREIGHT RATES (USD, 2024-25 market average)
+// Origin ports → Destinations
+// FCL20 / FCL40 = flat USD per container
+// LCL = USD per CBM
+// Air = USD per kg
+// ══════════════════════════════════════════════════════════
+const PORT_FREIGHT = {
+  // ── WEST COAST ──────────────────────────────────────────
+  INNSA: { // Nhava Sheva / JNPT
+    EU:  { fcl20:1800, fcl40:3000, lcl:72, air:4.2, transit:'20–25 days', via:'Suez Canal' },
+    UAE: { fcl20:650,  fcl40:1050, lcl:32, air:2.5, transit:'8–12 days',  via:'Direct' },
+    USA: { fcl20:2800, fcl40:4500, lcl:95, air:5.0, transit:'25–32 days', via:'Suez / Cape' },
+    BD:  { fcl20:1100, fcl40:1800, lcl:48, air:3.2, transit:'12–16 days', via:'Colombo T/S' },
+  },
+  INMUN: { // Mumbai Port
+    EU:  { fcl20:1850, fcl40:3100, lcl:74, air:4.2, transit:'21–26 days', via:'Suez Canal' },
+    UAE: { fcl20:680,  fcl40:1100, lcl:34, air:2.5, transit:'9–12 days',  via:'Direct' },
+    USA: { fcl20:2900, fcl40:4600, lcl:97, air:5.0, transit:'26–33 days', via:'Suez / Cape' },
+    BD:  { fcl20:1150, fcl40:1850, lcl:50, air:3.2, transit:'13–17 days', via:'Colombo T/S' },
+  },
+  INKAK: { // Kandla / Deendayal
+    EU:  { fcl20:1750, fcl40:2900, lcl:70, air:4.3, transit:'21–26 days', via:'Suez Canal' },
+    UAE: { fcl20:600,  fcl40:980,  lcl:30, air:2.4, transit:'7–10 days',  via:'Direct' },
+    USA: { fcl20:2750, fcl40:4400, lcl:92, air:5.1, transit:'25–32 days', via:'Suez / Cape' },
+    BD:  { fcl20:1200, fcl40:1900, lcl:50, air:3.3, transit:'13–17 days', via:'Colombo T/S' },
+  },
+  INMUN2: { // Mundra
+    EU:  { fcl20:1720, fcl40:2850, lcl:68, air:4.2, transit:'20–25 days', via:'Suez Canal' },
+    UAE: { fcl20:580,  fcl40:950,  lcl:29, air:2.4, transit:'7–9 days',   via:'Direct' },
+    USA: { fcl20:2700, fcl40:4350, lcl:90, air:5.0, transit:'25–31 days', via:'Suez / Cape' },
+    BD:  { fcl20:1180, fcl40:1880, lcl:49, air:3.2, transit:'12–16 days', via:'Colombo T/S' },
+  },
+  INPAV: { // Pipavav
+    EU:  { fcl20:1780, fcl40:2950, lcl:71, air:4.3, transit:'21–25 days', via:'Suez Canal' },
+    UAE: { fcl20:610,  fcl40:990,  lcl:31, air:2.4, transit:'7–10 days',  via:'Direct' },
+    USA: { fcl20:2780, fcl40:4420, lcl:93, air:5.0, transit:'25–32 days', via:'Suez / Cape' },
+    BD:  { fcl20:1200, fcl40:1920, lcl:50, air:3.3, transit:'12–16 days', via:'Colombo T/S' },
+  },
+  INCOK: { // Cochin / Kochi
+    EU:  { fcl20:1680, fcl40:2800, lcl:67, air:4.1, transit:'18–23 days', via:'Suez Canal' },
+    UAE: { fcl20:720,  fcl40:1150, lcl:36, air:2.6, transit:'10–13 days', via:'Direct' },
+    USA: { fcl20:2600, fcl40:4200, lcl:88, air:4.9, transit:'24–30 days', via:'Suez / Cape' },
+    BD:  { fcl20:1050, fcl40:1700, lcl:46, air:3.1, transit:'12–15 days', via:'Colombo T/S' },
+  },
+  INMRM: { // Mormugao / Goa
+    EU:  { fcl20:1760, fcl40:2920, lcl:70, air:4.2, transit:'20–25 days', via:'Suez Canal' },
+    UAE: { fcl20:670,  fcl40:1080, lcl:33, air:2.5, transit:'9–12 days',  via:'Direct' },
+    USA: { fcl20:2750, fcl40:4400, lcl:92, air:5.0, transit:'25–31 days', via:'Suez / Cape' },
+    BD:  { fcl20:1100, fcl40:1780, lcl:48, air:3.2, transit:'13–16 days', via:'Colombo T/S' },
+  },
+  INMAN: { // Mangalore / NMPT
+    EU:  { fcl20:1700, fcl40:2830, lcl:68, air:4.1, transit:'19–24 days', via:'Suez Canal' },
+    UAE: { fcl20:660,  fcl40:1060, lcl:33, air:2.5, transit:'9–12 days',  via:'Direct' },
+    USA: { fcl20:2650, fcl40:4250, lcl:89, air:4.9, transit:'24–31 days', via:'Suez / Cape' },
+    BD:  { fcl20:1080, fcl40:1750, lcl:47, air:3.1, transit:'12–16 days', via:'Colombo T/S' },
+  },
+  // ── EAST COAST ──────────────────────────────────────────
+  INCHE: { // Chennai
+    EU:  { fcl20:1900, fcl40:3150, lcl:76, air:4.3, transit:'19–24 days', via:'Suez Canal' },
+    UAE: { fcl20:850,  fcl40:1380, lcl:42, air:2.8, transit:'12–16 days', via:'Direct/Colombo' },
+    USA: { fcl20:2500, fcl40:4000, lcl:85, air:4.8, transit:'23–30 days', via:'Suez / Cape' },
+    BD:  { fcl20:950,  fcl40:1550, lcl:42, air:3.0, transit:'10–14 days', via:'Direct' },
+  },
+  INENR: { // Ennore / Kamarajar
+    EU:  { fcl20:1920, fcl40:3180, lcl:77, air:4.3, transit:'19–24 days', via:'Suez Canal' },
+    UAE: { fcl20:870,  fcl40:1400, lcl:43, air:2.8, transit:'12–16 days', via:'Colombo T/S' },
+    USA: { fcl20:2520, fcl40:4020, lcl:86, air:4.8, transit:'23–30 days', via:'Suez / Cape' },
+    BD:  { fcl20:960,  fcl40:1560, lcl:42, air:3.0, transit:'10–14 days', via:'Direct' },
+  },
+  INTUT: { // Tuticorin / VOC Port
+    EU:  { fcl20:1850, fcl40:3080, lcl:74, air:4.2, transit:'19–24 days', via:'Suez Canal' },
+    UAE: { fcl20:820,  fcl40:1320, lcl:41, air:2.7, transit:'12–15 days', via:'Colombo T/S' },
+    USA: { fcl20:2480, fcl40:3980, lcl:84, air:4.8, transit:'23–29 days', via:'Suez / Cape' },
+    BD:  { fcl20:980,  fcl40:1580, lcl:43, air:3.0, transit:'11–14 days', via:'Direct' },
+  },
+  INVIZ: { // Visakhapatnam
+    EU:  { fcl20:2000, fcl40:3300, lcl:80, air:4.4, transit:'21–26 days', via:'Suez Canal' },
+    UAE: { fcl20:920,  fcl40:1480, lcl:46, air:2.9, transit:'13–17 days', via:'Colombo T/S' },
+    USA: { fcl20:2600, fcl40:4150, lcl:88, air:4.9, transit:'24–31 days', via:'Suez / Cape' },
+    BD:  { fcl20:850,  fcl40:1380, lcl:38, air:2.9, transit:'9–13 days',  via:'Direct' },
+  },
+  INPRD: { // Paradip
+    EU:  { fcl20:2050, fcl40:3380, lcl:82, air:4.5, transit:'22–27 days', via:'Suez Canal' },
+    UAE: { fcl20:950,  fcl40:1520, lcl:47, air:3.0, transit:'14–18 days', via:'Colombo T/S' },
+    USA: { fcl20:2650, fcl40:4200, lcl:90, air:5.0, transit:'25–32 days', via:'Suez / Cape' },
+    BD:  { fcl20:800,  fcl40:1300, lcl:36, air:2.8, transit:'9–12 days',  via:'Direct' },
+  },
+  INHAL: { // Haldia / Kolkata
+    EU:  { fcl20:2100, fcl40:3450, lcl:84, air:4.5, transit:'23–28 days', via:'Suez Canal' },
+    UAE: { fcl20:980,  fcl40:1580, lcl:49, air:3.0, transit:'15–19 days', via:'Colombo T/S' },
+    USA: { fcl20:2700, fcl40:4300, lcl:92, air:5.1, transit:'26–33 days', via:'Suez / Cape' },
+    BD:  { fcl20:700,  fcl40:1150, lcl:32, air:2.7, transit:'7–10 days',  via:'Direct' },
+  },
+};
+
+// Destination ports for each market
+const DEST_PORTS = {
+  EU: [
+    {val:'NLRTM',label:'Rotterdam, Netherlands'},
+    {val:'DEHAM',label:'Hamburg, Germany'},
+    {val:'BEANR',label:'Antwerp, Belgium'},
+    {val:'GBFXT',label:'Felixstowe, United Kingdom'},
+    {val:'FRLEH',label:'Le Havre, France'},
+    {val:'ITMIL',label:'Genoa, Italy'},
+    {val:'ESBAR',label:'Barcelona, Spain'},
+    {val:'PLGDY',label:'Gdansk, Poland'},
+  ],
+  UAE: [
+    {val:'AEJEA',label:'Jebel Ali, Dubai'},
+    {val:'AEAUH',label:'Khalifa Port, Abu Dhabi'},
+    {val:'AESHJ',label:'Sharjah Port'},
+  ],
+  USA: [
+    {val:'USLAX',label:'Los Angeles / Long Beach, CA'},
+    {val:'USNYC',label:'New York / New Jersey'},
+    {val:'USSAV',label:'Savannah, Georgia'},
+    {val:'USHOU',label:'Houston, Texas'},
+    {val:'USSEA',label:'Seattle / Tacoma, WA'},
+    {val:'USMIA',label:'Miami, Florida'},
+  ],
+  BD: [
+    {val:'BDCGP',label:'Chittagong Port'},
+    {val:'BDMON',label:'Mongla Port'},
+  ],
+};
+
+// ══════════════════════════════════════════════════════════
+// HSN DUTY DATABASE (India → EU / UAE / USA / BD)
+// Format: hsn_prefix: { desc, notes, EU:{rate,gspRate,gspNote}, UAE:{rate,cepaRate,cepaNote}, USA:{rate,notes}, BD:{cd,sd,vatPct,ait} }
+// ══════════════════════════════════════════════════════════
+const HSN_DB = {
+  // ── CHAPTER 01–05: LIVE ANIMALS / ANIMAL PRODUCTS ────────
+  '01': { desc:'Live Animals', notes:'Veterinary certificates required', EU:{rate:0,gsp:0}, UAE:{rate:0,cepa:0}, USA:{rate:0}, BD:{cd:10,sd:0} },
+  '02': { desc:'Meat & Edible Offal', notes:'SPS/phytosanitary controls', EU:{rate:12.8,gsp:10}, UAE:{rate:5,cepa:0}, USA:{rate:1.4}, BD:{cd:25,sd:20} },
+  '03': { desc:'Fish & Seafood', notes:'India major exporter – shrimp, prawns, fish', EU:{rate:6,gsp:0}, UAE:{rate:5,cepa:0}, USA:{rate:0.5}, BD:{cd:25,sd:0} },
+  '0301':{ desc:'Live Fish', EU:{rate:0,gsp:0}, UAE:{rate:5,cepa:0}, USA:{rate:0}, BD:{cd:10,sd:0} },
+  '0302':{ desc:'Fresh / Chilled Fish', EU:{rate:6,gsp:0}, UAE:{rate:5,cepa:0}, USA:{rate:0}, BD:{cd:25,sd:0} },
+  '0303':{ desc:'Frozen Fish', EU:{rate:13.7,gsp:0}, UAE:{rate:5,cepa:0}, USA:{rate:0}, BD:{cd:25,sd:0} },
+  '0306':{ desc:'Crustaceans (Shrimp, Prawns, Lobster)', notes:'India #1 seafood exporter', EU:{rate:12,gsp:0}, UAE:{rate:5,cepa:0}, USA:{rate:0}, BD:{cd:25,sd:0} },
+  '04': { desc:'Dairy, Eggs, Honey', EU:{rate:17.5,gsp:14}, UAE:{rate:5,cepa:0}, USA:{rate:16}, BD:{cd:25,sd:0} },
+  '05': { desc:'Other Animal Products', EU:{rate:2.1,gsp:0}, UAE:{rate:5,cepa:0}, USA:{rate:1}, BD:{cd:25,sd:0} },
+  // ── CHAPTER 06–14: VEGETABLE PRODUCTS ───────────────────
+  '06': { desc:'Live Plants & Floriculture', EU:{rate:6.5,gsp:0}, UAE:{rate:5,cepa:0}, USA:{rate:0}, BD:{cd:25,sd:0} },
+  '07': { desc:'Vegetables', notes:'Seasonal duties may apply in EU', EU:{rate:8.8,gsp:0}, UAE:{rate:5,cepa:0}, USA:{rate:6.4}, BD:{cd:25,sd:0} },
+  '08': { desc:'Fruits & Nuts', EU:{rate:8,gsp:0}, UAE:{rate:5,cepa:0}, USA:{rate:1.5}, BD:{cd:25,sd:0} },
+  '0801':{ desc:'Coconuts, Brazil nuts, Cashew nuts', notes:'India major cashew exporter', EU:{rate:3.2,gsp:0}, UAE:{rate:5,cepa:0}, USA:{rate:0}, BD:{cd:25,sd:0} },
+  '09': { desc:'Coffee, Tea, Spices', notes:'India key exporter of tea, spices', EU:{rate:0,gsp:0}, UAE:{rate:5,cepa:0}, USA:{rate:0}, BD:{cd:25,sd:0} },
+  '0902':{ desc:'Tea', EU:{rate:0,gsp:0}, UAE:{rate:5,cepa:0}, USA:{rate:0}, BD:{cd:25,sd:0} },
+  '0907':{ desc:'Cloves', EU:{rate:0,gsp:0}, UAE:{rate:5,cepa:0}, USA:{rate:0}, BD:{cd:25,sd:0} },
+  '0910':{ desc:'Ginger, Saffron, Turmeric, Curry powder', EU:{rate:0,gsp:0}, UAE:{rate:5,cepa:0}, USA:{rate:1.9}, BD:{cd:25,sd:0} },
+  '10': { desc:'Cereals', EU:{rate:4.6,gsp:0}, UAE:{rate:5,cepa:0}, USA:{rate:0.5}, BD:{cd:25,sd:0} },
+  '1006':{ desc:'Rice', notes:'India major rice exporter. EU has specific duties', EU:{rate:175,gsp:0,unit:'€/tonne'}, UAE:{rate:5,cepa:0}, USA:{rate:1.4}, BD:{cd:25,sd:0} },
+  '1001':{ desc:'Wheat', EU:{rate:95,gsp:0,unit:'€/tonne'}, UAE:{rate:5,cepa:0}, USA:{rate:0.7}, BD:{cd:25,sd:0} },
+  '11': { desc:'Milling Industry Products (Flour)', EU:{rate:9.7,gsp:0}, UAE:{rate:5,cepa:0}, USA:{rate:0.4}, BD:{cd:25,sd:0} },
+  '12': { desc:'Oil Seeds, Oleaginous Fruits', notes:'Sesame, groundnut, soybeans', EU:{rate:0,gsp:0}, UAE:{rate:5,cepa:0}, USA:{rate:0}, BD:{cd:25,sd:0} },
+  '13': { desc:'Lac, Gums, Resins', EU:{rate:0,gsp:0}, UAE:{rate:5,cepa:0}, USA:{rate:0}, BD:{cd:25,sd:0} },
+  '14': { desc:'Vegetable Plaiting Materials', EU:{rate:0,gsp:0}, UAE:{rate:5,cepa:0}, USA:{rate:0}, BD:{cd:25,sd:0} },
+  // ── CHAPTER 15: FATS & OILS ──────────────────────────────
+  '15': { desc:'Animal / Vegetable Fats & Oils', EU:{rate:4.3,gsp:2}, UAE:{rate:5,cepa:0}, USA:{rate:2.9}, BD:{cd:25,sd:0} },
+  '1511':{ desc:'Palm Oil', EU:{rate:0,gsp:0}, UAE:{rate:5,cepa:0}, USA:{rate:0}, BD:{cd:25,sd:0} },
+  '1514':{ desc:'Rapeseed / Mustard Oil', EU:{rate:6.4,gsp:3}, UAE:{rate:5,cepa:0}, USA:{rate:2.3}, BD:{cd:25,sd:0} },
+  // ── CHAPTER 16–24: FOOD PREPARATIONS ────────────────────
+  '16': { desc:'Preparations of Meat / Fish', EU:{rate:14.9,gsp:11}, UAE:{rate:5,cepa:0}, USA:{rate:6.9}, BD:{cd:25,sd:0} },
+  '17': { desc:'Sugars & Sugar Confectionery', EU:{rate:23.6,gsp:17}, UAE:{rate:5,cepa:0}, USA:{rate:6.4}, BD:{cd:25,sd:0} },
+  '18': { desc:'Cocoa & Cocoa Preparations', EU:{rate:5.1,gsp:0}, UAE:{rate:5,cepa:0}, USA:{rate:0.6}, BD:{cd:25,sd:0} },
+  '19': { desc:'Preparations of Cereals, Pastry', EU:{rate:9,gsp:6}, UAE:{rate:5,cepa:0}, USA:{rate:4.7}, BD:{cd:25,sd:0} },
+  '20': { desc:'Preparations of Vegetables, Fruit', notes:'Pickles, chutneys, pastes', EU:{rate:17.6,gsp:14}, UAE:{rate:5,cepa:0}, USA:{rate:9.7}, BD:{cd:25,sd:0} },
+  '2001':{ desc:'Vegetables in Vinegar (Pickles)', EU:{rate:9.6,gsp:5}, UAE:{rate:5,cepa:0}, USA:{rate:8.2}, BD:{cd:25,sd:0} },
+  '2103':{ desc:'Sauces / Condiments / Mixed Seasonings', EU:{rate:7.7,gsp:4}, UAE:{rate:5,cepa:0}, USA:{rate:6.4}, BD:{cd:25,sd:0} },
+  '21': { desc:'Miscellaneous Edible Preparations', EU:{rate:7.7,gsp:4}, UAE:{rate:5,cepa:0}, USA:{rate:4.8}, BD:{cd:25,sd:0} },
+  '22': { desc:'Beverages, Spirits, Vinegar', EU:{rate:8.9,gsp:5}, UAE:{rate:5,cepa:0}, USA:{rate:4.7}, BD:{cd:25,sd:100} },
+  '23': { desc:'Residues & Waste from Food Industry', EU:{rate:0,gsp:0}, UAE:{rate:5,cepa:0}, USA:{rate:0.5}, BD:{cd:25,sd:0} },
+  '24': { desc:'Tobacco & Tobacco Products', EU:{rate:57.6,gsp:47}, UAE:{rate:100,cepa:100,notes:'Excise tax 100%'}, USA:{rate:350}, BD:{cd:25,sd:250} },
+  // ── CHAPTER 25–27: MINERAL PRODUCTS ─────────────────────
+  '25': { desc:'Salt, Sulphur, Stone, Cement', notes:'Granite, marble – India key exporter', EU:{rate:0,gsp:0}, UAE:{rate:5,cepa:0}, USA:{rate:0.8}, BD:{cd:10,sd:0} },
+  '2515':{ desc:'Marble, Travertine, Granite (blocks)', EU:{rate:1.7,gsp:0}, UAE:{rate:5,cepa:0}, USA:{rate:3.7}, BD:{cd:25,sd:0} },
+  '26': { desc:'Ores, Slag and Ash', EU:{rate:0,gsp:0}, UAE:{rate:0,cepa:0}, USA:{rate:0}, BD:{cd:5,sd:0} },
+  '27': { desc:'Mineral Fuels, Mineral Oils', EU:{rate:3.5,gsp:0}, UAE:{rate:0,cepa:0}, USA:{rate:1}, BD:{cd:10,sd:0} },
+  // ── CHAPTER 28–38: CHEMICALS ─────────────────────────────
+  '28': { desc:'Inorganic Chemicals', EU:{rate:3.2,gsp:0}, UAE:{rate:5,cepa:0}, USA:{rate:3.7}, BD:{cd:10,sd:0} },
+  '29': { desc:'Organic Chemicals', notes:'India major pharma intermediate exporter', EU:{rate:3.2,gsp:0}, UAE:{rate:5,cepa:0}, USA:{rate:3.7}, BD:{cd:10,sd:0} },
+  '30': { desc:'Pharmaceutical Products', notes:'India "pharmacy of the world"', EU:{rate:0,gsp:0}, UAE:{rate:0,cepa:0}, USA:{rate:0}, BD:{cd:10,sd:0} },
+  '3004':{ desc:'Medicaments (Formulations)', EU:{rate:0,gsp:0}, UAE:{rate:0,cepa:0}, USA:{rate:0}, BD:{cd:5,sd:0} },
+  '31': { desc:'Fertilisers', EU:{rate:3.2,gsp:0}, UAE:{rate:5,cepa:0}, USA:{rate:1.5}, BD:{cd:10,sd:0} },
+  '32': { desc:'Tanning / Dyeing Extracts, Paints', EU:{rate:3.9,gsp:0}, UAE:{rate:5,cepa:0}, USA:{rate:3.7}, BD:{cd:25,sd:0} },
+  '33': { desc:'Essential Oils, Perfumery, Cosmetics', notes:'Sandal, rose, jasmine oils', EU:{rate:3.7,gsp:0}, UAE:{rate:5,cepa:0}, USA:{rate:5.5}, BD:{cd:25,sd:0} },
+  '34': { desc:'Soap, Wax, Polishes, Candles', EU:{rate:1.5,gsp:0}, UAE:{rate:5,cepa:0}, USA:{rate:2.6}, BD:{cd:25,sd:0} },
+  '35': { desc:'Albuminoidal Substances, Glues', EU:{rate:4.6,gsp:0}, UAE:{rate:5,cepa:0}, USA:{rate:3.5}, BD:{cd:25,sd:0} },
+  '38': { desc:'Miscellaneous Chemical Products', EU:{rate:3.7,gsp:0}, UAE:{rate:5,cepa:0}, USA:{rate:3.1}, BD:{cd:25,sd:0} },
+  // ── CHAPTER 39–40: PLASTICS & RUBBER ────────────────────
+  '39': { desc:'Plastics & Plastic Articles', EU:{rate:4.6,gsp:2}, UAE:{rate:5,cepa:0}, USA:{rate:5.3}, BD:{cd:25,sd:0} },
+  '40': { desc:'Rubber & Rubber Articles', notes:'Tyres, gloves – India major exporter', EU:{rate:3.7,gsp:0}, UAE:{rate:5,cepa:0}, USA:{rate:4}, BD:{cd:25,sd:0} },
+  '4011':{ desc:'New Pneumatic Tyres', EU:{rate:4.5,gsp:2}, UAE:{rate:5,cepa:0}, USA:{rate:4}, BD:{cd:25,sd:0} },
+  // ── CHAPTER 41–43: HIDES, LEATHER ────────────────────────
+  '41': { desc:'Raw Hides & Skins / Leather', notes:'India 2nd largest leather exporter', EU:{rate:0,gsp:0}, UAE:{rate:0,cepa:0}, USA:{rate:2.5}, BD:{cd:25,sd:0} },
+  '42': { desc:'Leather Articles, Handbags, Travel Goods', EU:{rate:2.7,gsp:0}, UAE:{rate:5,cepa:0}, USA:{rate:9}, BD:{cd:25,sd:0} },
+  '4202':{ desc:'Handbags, Wallets, Briefcases', EU:{rate:2.7,gsp:0}, UAE:{rate:5,cepa:0}, USA:{rate:12.1}, BD:{cd:25,sd:0} },
+  '43': { desc:'Furskins & Fur Articles', EU:{rate:0,gsp:0}, UAE:{rate:5,cepa:0}, USA:{rate:5.5}, BD:{cd:25,sd:0} },
+  // ── CHAPTER 44–46: WOOD & WOOD PRODUCTS ─────────────────
+  '44': { desc:'Wood & Wood Articles', EU:{rate:2,gsp:0}, UAE:{rate:5,cepa:0}, USA:{rate:3.2}, BD:{cd:25,sd:0} },
+  '45': { desc:'Cork & Cork Articles', EU:{rate:0,gsp:0}, UAE:{rate:5,cepa:0}, USA:{rate:0}, BD:{cd:25,sd:0} },
+  // ── CHAPTER 47–49: PAPER ────────────────────────────────
+  '47': { desc:'Pulp of Wood', EU:{rate:0,gsp:0}, UAE:{rate:5,cepa:0}, USA:{rate:0}, BD:{cd:10,sd:0} },
+  '48': { desc:'Paper & Paperboard', EU:{rate:0,gsp:0}, UAE:{rate:5,cepa:0}, USA:{rate:0.4}, BD:{cd:25,sd:0} },
+  '49': { desc:'Printed Books, Newspapers', EU:{rate:0,gsp:0}, UAE:{rate:0,cepa:0}, USA:{rate:0}, BD:{cd:25,sd:0} },
+  // ── CHAPTER 50–63: TEXTILES & GARMENTS ──────────────────
+  '50': { desc:'Silk', notes:'India major silk exporter', EU:{rate:4,gsp:0}, UAE:{rate:5,cepa:0}, USA:{rate:1.1}, BD:{cd:25,sd:0} },
+  '51': { desc:'Wool & Animal Hair', EU:{rate:3.7,gsp:0}, UAE:{rate:5,cepa:0}, USA:{rate:18.8}, BD:{cd:25,sd:0} },
+  '52': { desc:'Cotton', notes:'India #2 cotton exporter', EU:{rate:0,gsp:0}, UAE:{rate:0,cepa:0}, USA:{rate:0}, BD:{cd:10,sd:0} },
+  '5201':{ desc:'Cotton, not carded/combed (raw)', EU:{rate:0,gsp:0}, UAE:{rate:0,cepa:0}, USA:{rate:0}, BD:{cd:10,sd:0} },
+  '5208':{ desc:'Cotton Woven Fabrics', EU:{rate:8,gsp:5.6}, UAE:{rate:5,cepa:0}, USA:{rate:12.2}, BD:{cd:25,sd:0} },
+  '53': { desc:'Other Vegetable Textile Fibres (Jute)', notes:'India top jute exporter', EU:{rate:0,gsp:0}, UAE:{rate:0,cepa:0}, USA:{rate:0}, BD:{cd:25,sd:0} },
+  '5303':{ desc:'Jute & Other Textile Bast Fibres', EU:{rate:0,gsp:0}, UAE:{rate:0,cepa:0}, USA:{rate:0}, BD:{cd:25,sd:0} },
+  '54': { desc:'Man-made Filament Yarn / Fabric', EU:{rate:4,gsp:2}, UAE:{rate:5,cepa:0}, USA:{rate:14.9}, BD:{cd:25,sd:0} },
+  '55': { desc:'Man-made Staple Fibres', EU:{rate:3.8,gsp:0}, UAE:{rate:5,cepa:0}, USA:{rate:12.5}, BD:{cd:25,sd:0} },
+  '56': { desc:'Wadding, Felt, Nonwovens, Ropes', EU:{rate:3.8,gsp:0}, UAE:{rate:5,cepa:0}, USA:{rate:6.4}, BD:{cd:25,sd:0} },
+  '57': { desc:'Carpets & Textile Floor Coverings', notes:'India major carpet exporter', EU:{rate:5.6,gsp:3}, UAE:{rate:5,cepa:0}, USA:{rate:3.1}, BD:{cd:25,sd:0} },
+  '5701':{ desc:'Carpets, Knotted (Hand-knotted)', EU:{rate:2.2,gsp:0}, UAE:{rate:5,cepa:0}, USA:{rate:4.5}, BD:{cd:25,sd:0} },
+  '58': { desc:'Special Woven Fabrics, Embroidery', EU:{rate:8,gsp:5.6}, UAE:{rate:5,cepa:0}, USA:{rate:13.5}, BD:{cd:25,sd:0} },
+  '59': { desc:'Impregnated, Coated Textile Fabrics', EU:{rate:4,gsp:2}, UAE:{rate:5,cepa:0}, USA:{rate:7.7}, BD:{cd:25,sd:0} },
+  '60': { desc:'Knitted or Crocheted Fabrics', EU:{rate:8,gsp:5.6}, UAE:{rate:5,cepa:0}, USA:{rate:10.8}, BD:{cd:25,sd:0} },
+  '61': { desc:'Knitted/Crocheted Clothing & Accessories', notes:'T-shirts, sweaters, hosiery', EU:{rate:12,gsp:9.6}, UAE:{rate:5,cepa:0}, USA:{rate:16.5}, BD:{cd:25,sd:0} },
+  '6101':{ desc:'Overcoats, Raincoats (Knitted) — Men', EU:{rate:12,gsp:9.6}, UAE:{rate:5,cepa:0}, USA:{rate:27.7}, BD:{cd:25,sd:0} },
+  '6105':{ desc:'Shirts (Knitted) — Men/Boys', EU:{rate:12,gsp:9.6}, UAE:{rate:5,cepa:0}, USA:{rate:19.7}, BD:{cd:25,sd:0} },
+  '6109':{ desc:'T-Shirts, Singlets (Knitted)', notes:'India major T-shirt exporter', EU:{rate:12,gsp:9.6}, UAE:{rate:5,cepa:0}, USA:{rate:16.5}, BD:{cd:25,sd:0} },
+  '62': { desc:'Woven Clothing & Accessories (not knitted)', notes:'Shirts, trousers, dresses, suits', EU:{rate:12,gsp:9.6}, UAE:{rate:5,cepa:0}, USA:{rate:20.4}, BD:{cd:25,sd:0} },
+  '6201':{ desc:'Overcoats, Windcheaters — Men (Woven)', EU:{rate:12,gsp:9.6}, UAE:{rate:5,cepa:0}, USA:{rate:27.7}, BD:{cd:25,sd:0} },
+  '6203':{ desc:'Suits, Blazers, Trousers — Men (Woven)', EU:{rate:12,gsp:9.6}, UAE:{rate:5,cepa:0}, USA:{rate:16}, BD:{cd:25,sd:0} },
+  '6204':{ desc:'Suits, Dresses, Skirts — Women (Woven)', EU:{rate:12,gsp:9.6}, UAE:{rate:5,cepa:0}, USA:{rate:16}, BD:{cd:25,sd:0} },
+  '6205':{ desc:'Shirts — Men (Woven)', EU:{rate:12,gsp:9.6}, UAE:{rate:5,cepa:0}, USA:{rate:25.9}, BD:{cd:25,sd:0} },
+  '6211':{ desc:'Tracksuits, Swimwear, Other Garments', EU:{rate:12,gsp:9.6}, UAE:{rate:5,cepa:0}, USA:{rate:11.9}, BD:{cd:25,sd:0} },
+  '63': { desc:'Made-up Textile Articles (Bed/Bath Linen, Bags)', notes:'Bed sheets, towels, bags', EU:{rate:12,gsp:9.6}, UAE:{rate:5,cepa:0}, USA:{rate:11.3}, BD:{cd:25,sd:0} },
+  '6301':{ desc:'Blankets & Travelling Rugs', EU:{rate:12,gsp:9.6}, UAE:{rate:5,cepa:0}, USA:{rate:10.3}, BD:{cd:25,sd:0} },
+  '6302':{ desc:'Bed Linen, Table Linen, Bath Towels', notes:'India top exporter of home textiles', EU:{rate:12,gsp:9.6}, UAE:{rate:5,cepa:0}, USA:{rate:11.3}, BD:{cd:25,sd:0} },
+  // ── CHAPTER 64–67: FOOTWEAR, HEADGEAR ───────────────────
+  '64': { desc:'Footwear (Shoes, Sandals, Boots)', notes:'India 3rd largest footwear exporter', EU:{rate:17,gsp:12.9}, UAE:{rate:5,cepa:0}, USA:{rate:10.5}, BD:{cd:25,sd:0} },
+  '6403':{ desc:'Footwear with Leather Uppers', EU:{rate:3.7,gsp:0}, UAE:{rate:5,cepa:0}, USA:{rate:10}, BD:{cd:25,sd:0} },
+  '6404':{ desc:'Footwear with Textile Uppers', EU:{rate:17,gsp:12.9}, UAE:{rate:5,cepa:0}, USA:{rate:37.5}, BD:{cd:25,sd:0} },
+  '65': { desc:'Headgear', EU:{rate:3.7,gsp:0}, UAE:{rate:5,cepa:0}, USA:{rate:8}, BD:{cd:25,sd:0} },
+  '66': { desc:'Umbrellas, Walking Sticks', EU:{rate:3.7,gsp:0}, UAE:{rate:5,cepa:0}, USA:{rate:6.5}, BD:{cd:25,sd:0} },
+  // ── CHAPTER 68–70: STONE, CERAMIC, GLASS ────────────────
+  '68': { desc:'Stone, Plaster, Cement Articles', notes:'Granite, slate products', EU:{rate:1.7,gsp:0}, UAE:{rate:5,cepa:0}, USA:{rate:4.9}, BD:{cd:25,sd:0} },
+  '6802':{ desc:'Worked Monumental Stone (Granite, Marble)', EU:{rate:1.7,gsp:0}, UAE:{rate:5,cepa:0}, USA:{rate:3.7}, BD:{cd:25,sd:0} },
+  '69': { desc:'Ceramic Products', EU:{rate:7.2,gsp:3}, UAE:{rate:5,cepa:0}, USA:{rate:6}, BD:{cd:25,sd:0} },
+  '6908':{ desc:'Glazed Ceramic Flags, Tiles', EU:{rate:7.2,gsp:3}, UAE:{rate:5,cepa:0}, USA:{rate:7.7}, BD:{cd:25,sd:0} },
+  '70': { desc:'Glass & Glassware', EU:{rate:5.2,gsp:0}, UAE:{rate:5,cepa:0}, USA:{rate:5.8}, BD:{cd:25,sd:0} },
+  // ── CHAPTER 71: GEMS & JEWELLERY ─────────────────────────
+  '71': { desc:'Natural Stones, Precious Metals, Jewellery', notes:'India #1 cut diamond exporter', EU:{rate:0,gsp:0}, UAE:{rate:0,cepa:0}, USA:{rate:0}, BD:{cd:25,sd:0} },
+  '7102':{ desc:'Diamonds (Cut & Uncut)', EU:{rate:0,gsp:0}, UAE:{rate:0,cepa:0}, USA:{rate:0}, BD:{cd:10,sd:0} },
+  '7113':{ desc:'Jewellery of Precious Metal', EU:{rate:2.5,gsp:0}, UAE:{rate:5,cepa:0,notes:'Gold: 0% under CEPA'}, USA:{rate:6.5}, BD:{cd:25,sd:0} },
+  '7116':{ desc:'Articles of Natural Stones (Coral, Shell)', EU:{rate:2.5,gsp:0}, UAE:{rate:5,cepa:0}, USA:{rate:2.1}, BD:{cd:25,sd:0} },
+  // ── CHAPTER 72–83: METALS ────────────────────────────────
+  '72': { desc:'Iron & Steel', EU:{rate:1.8,gsp:0}, UAE:{rate:5,cepa:0}, USA:{rate:25,notes:'Section 232 tariff 25%'}, BD:{cd:10,sd:0} },
+  '73': { desc:'Iron / Steel Articles', EU:{rate:3.8,gsp:0}, UAE:{rate:5,cepa:0}, USA:{rate:25,notes:'Sec 232'}, BD:{cd:25,sd:0} },
+  '74': { desc:'Copper & Articles Thereof', EU:{rate:1.7,gsp:0}, UAE:{rate:0,cepa:0}, USA:{rate:3.1}, BD:{cd:10,sd:0} },
+  '76': { desc:'Aluminium & Articles Thereof', EU:{rate:1.7,gsp:0}, UAE:{rate:5,cepa:0}, USA:{rate:10,notes:'Section 232 tariff'}, BD:{cd:10,sd:0} },
+  '82': { desc:'Tools, Cutlery, Spoons, Forks (Metal)', notes:'Surgical instruments, cutlery', EU:{rate:2.7,gsp:0}, UAE:{rate:5,cepa:0}, USA:{rate:3.7}, BD:{cd:25,sd:0} },
+  '83': { desc:'Miscellaneous Articles of Base Metal', EU:{rate:2.7,gsp:0}, UAE:{rate:5,cepa:0}, USA:{rate:3.7}, BD:{cd:25,sd:0} },
+  // ── CHAPTER 84–85: MACHINERY & ELECTRONICS ──────────────
+  '84': { desc:'Machinery, Mechanical Appliances', EU:{rate:1.7,gsp:0}, UAE:{rate:5,cepa:0}, USA:{rate:2}, BD:{cd:10,sd:0} },
+  '8401':{ desc:'Nuclear Reactors, Fuel Elements', EU:{rate:0,gsp:0}, UAE:{rate:0,cepa:0}, USA:{rate:0}, BD:{cd:5,sd:0} },
+  '8471':{ desc:'Computers & Data Processing Machines', EU:{rate:0,gsp:0}, UAE:{rate:0,cepa:0}, USA:{rate:0}, BD:{cd:10,sd:0} },
+  '8481':{ desc:'Taps, Cocks, Valves (Mechanical)', EU:{rate:1.7,gsp:0}, UAE:{rate:5,cepa:0}, USA:{rate:2}, BD:{cd:10,sd:0} },
+  '85': { desc:'Electrical Machinery, Electronics', EU:{rate:1.7,gsp:0}, UAE:{rate:5,cepa:0}, USA:{rate:1.5}, BD:{cd:10,sd:0} },
+  '8501':{ desc:'Electric Motors & Generators', EU:{rate:1.7,gsp:0}, UAE:{rate:5,cepa:0}, USA:{rate:2.5}, BD:{cd:10,sd:0} },
+  '8517':{ desc:'Telephone Sets, Smartphones', EU:{rate:0,gsp:0}, UAE:{rate:0,cepa:0}, USA:{rate:0}, BD:{cd:10,sd:0} },
+  '8528':{ desc:'Monitors, Televisions, Projectors', EU:{rate:0,gsp:0}, UAE:{rate:5,cepa:0}, USA:{rate:3.9}, BD:{cd:25,sd:0} },
+  // ── CHAPTER 86–89: TRANSPORT ─────────────────────────────
+  '87': { desc:'Vehicles (Automobiles, Two-wheelers)', notes:'Two-wheelers – India major exporter', EU:{rate:6.5,gsp:4.5}, UAE:{rate:5,cepa:0}, USA:{rate:2.5}, BD:{cd:25,sd:45} },
+  '8703':{ desc:'Passenger Cars', EU:{rate:6.5,gsp:4.5}, UAE:{rate:5,cepa:0}, USA:{rate:2.5}, BD:{cd:25,sd:45} },
+  '8711':{ desc:'Motorcycles & Scooters', EU:{rate:6,gsp:4}, UAE:{rate:5,cepa:0}, USA:{rate:2.4}, BD:{cd:25,sd:45} },
+  '8714':{ desc:'Motorcycle/Cycle Parts & Accessories', EU:{rate:2.7,gsp:0}, UAE:{rate:5,cepa:0}, USA:{rate:3}, BD:{cd:25,sd:0} },
+  '89': { desc:'Ships, Boats and Floating Structures', EU:{rate:0,gsp:0}, UAE:{rate:0,cepa:0}, USA:{rate:0}, BD:{cd:5,sd:0} },
+  // ── CHAPTER 90–92: OPTICS / INSTRUMENTS ─────────────────
+  '90': { desc:'Optical, Photographic, Medical Instruments', EU:{rate:1.7,gsp:0}, UAE:{rate:0,cepa:0}, USA:{rate:1.7}, BD:{cd:10,sd:0} },
+  '9018':{ desc:'Medical, Surgical, Dental Instruments', EU:{rate:0,gsp:0}, UAE:{rate:0,cepa:0}, USA:{rate:0}, BD:{cd:5,sd:0} },
+  // ── CHAPTER 94: FURNITURE ────────────────────────────────
+  '94': { desc:'Furniture, Bedding, Lamps & Lighting', EU:{rate:5.6,gsp:3}, UAE:{rate:5,cepa:0}, USA:{rate:6}, BD:{cd:25,sd:0} },
+  '9401':{ desc:'Seats (Chairs, Sofas)', EU:{rate:5.6,gsp:3}, UAE:{rate:5,cepa:0}, USA:{rate:6}, BD:{cd:25,sd:0} },
+  '9403':{ desc:'Other Furniture', EU:{rate:5.6,gsp:3}, UAE:{rate:5,cepa:0}, USA:{rate:6}, BD:{cd:25,sd:0} },
+  // ── CHAPTER 95: TOYS & SPORTS ────────────────────────────
+  '95': { desc:'Toys, Games & Sports Equipment', EU:{rate:4.7,gsp:0}, UAE:{rate:5,cepa:0}, USA:{rate:7.6}, BD:{cd:25,sd:0} },
+  '9503':{ desc:'Tricycles, Scooters, Dolls, Toys', EU:{rate:4.7,gsp:0}, UAE:{rate:5,cepa:0}, USA:{rate:0}, BD:{cd:25,sd:0} },
+  // ── CHAPTER 96–97: MISC ──────────────────────────────────
+  '96': { desc:'Miscellaneous Manufactured Articles', EU:{rate:2.7,gsp:0}, UAE:{rate:5,cepa:0}, USA:{rate:4.6}, BD:{cd:25,sd:0} },
+  '9608':{ desc:'Ball-point, Felt-tip Pens', EU:{rate:2.7,gsp:0}, UAE:{rate:5,cepa:0}, USA:{rate:0.4}, BD:{cd:25,sd:0} },
+};
+
+function lookupHSN() {
+  const raw = document.getElementById('hsn_code').value.trim().replace(/\./g,'');
+  if (!raw) { alert('Enter an HSN code'); return; }
+  // Try 6-digit, then 4-digit, then 2-digit
+  const lookups = [raw, raw.slice(0,4), raw.slice(0,2)];
+  let found = null;
+  for (const k of lookups) {
+    if (HSN_DB[k]) { found = { key:k, data:HSN_DB[k] }; break; }
+  }
+  const box = document.getElementById('hsn-result');
+  if (!found) {
+    box.className='hsn-result show';
+    box.innerHTML=`<div style="color:var(--red);font-size:0.82rem">HSN not found in database. Enter duty % manually, or check <a href="https://www.icegate.gov.in" target="_blank" style="color:var(--teal)">ICEGATE</a>.</div>`;
+    currentHSNData=null; return;
+  }
+  currentHSNData = found;
+  const d = found.data;
+  document.getElementById('hsn-chapter-label').textContent = `Chapter ${found.key} — HSN ${raw}`;
+  document.getElementById('hsn-desc').textContent = d.desc;
+  document.getElementById('hsn-notes').textContent = d.notes || '';
+
+  const destKey = selDestKey;
+  const fmtDuty = (rate,unit) => unit ? `${rate} ${unit}` : `${rate}%`;
+  let grid = '';
+
+  // EU rate
+  let euRate = d.EU.gsp !== undefined ? d.EU.gsp : d.EU.rate;
+  let euBadge = (d.EU.gsp !== undefined && d.EU.gsp < d.EU.rate) ? ` <span style="color:var(--green);font-size:0.65rem">(GSP: ${fmtDuty(d.EU.gsp,d.EU.unit)} vs MFN ${fmtDuty(d.EU.rate,d.EU.unit)})</span>` : '';
+  grid += `<div class="hsn-duty-item"><div><span class="hsn-duty-flag">🇪🇺</span><span class="hsn-duty-name"> EU</span></div><div class="hsn-duty-val">${fmtDuty(euRate,d.EU.unit)}${euBadge}</div><div class="hsn-duty-note">+VAT 21% on CIF+duty</div></div>`;
+
+  // UAE rate (India gets CEPA benefit)
+  let uaeRate = d.UAE.cepa !== undefined ? d.UAE.cepa : d.UAE.rate;
+  let uaeBadge = (d.UAE.cepa !== undefined && d.UAE.cepa < d.UAE.rate) ? ` <span style="color:var(--green);font-size:0.65rem">(CEPA: ${uaeRate}% vs MFN ${d.UAE.rate}%)</span>` : '';
+  grid += `<div class="hsn-duty-item"><div><span class="hsn-duty-flag">🇦🇪</span><span class="hsn-duty-name"> UAE</span></div><div class="hsn-duty-val">${uaeRate}%${uaeBadge}</div><div class="hsn-duty-note">+VAT 5% on CIF+duty</div></div>`;
+
+  // USA
+  let usaNote = d.USA.notes || `MFN rate — verify HTS`;
+  grid += `<div class="hsn-duty-item"><div><span class="hsn-duty-flag">🇺🇸</span><span class="hsn-duty-name"> USA</span></div><div class="hsn-duty-val">${d.USA.rate}%</div><div class="hsn-duty-note">${usaNote}</div></div>`;
+
+  // BD
+  let bdTotal = (d.BD.cd||0) + (d.BD.sd||0);
+  grid += `<div class="hsn-duty-item"><div><span class="hsn-duty-flag">🇧🇩</span><span class="hsn-duty-name"> Bangladesh</span></div><div class="hsn-duty-val">CD ${d.BD.cd}%${d.BD.sd ? ` + SD ${d.BD.sd}%` : ''}</div><div class="hsn-duty-note">+VAT 15% + AIT 5%</div></div>`;
+
+  document.getElementById('hsn-duty-grid').innerHTML = grid;
+  box.className='hsn-result show';
+}
+
+// ══════════════════════════════════════════════════════════
+// UI CONTROLLERS
+// ══════════════════════════════════════════════════════════
+const INCO_TEXT = {
+  EXW:'Ex Works — buyer arranges everything from your factory gate. Your quote = factory price only.',
+  FOB:'Free on Board — you cover export clearance and loading the vessel. Buyer pays ocean freight, insurance, import duties. Most common.',
+  CIF:'Cost, Insurance & Freight — you pay freight + marine insurance to destination port. Buyer handles import customs and onward delivery.',
+  CFR:'Cost & Freight — you pay freight but NOT insurance. Buyer arranges their own marine insurance.',
+  DDP:'Delivered Duty Paid — you cover everything: freight, insurance, duties, local delivery. All-inclusive price to buyer.',
+  FCA:'Free Carrier — you deliver to named carrier at your port/city. Works well for containerised cargo; similar to FOB.',
+};
+
+function selInco(btn) {
+  document.querySelectorAll('.inco-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  selIncoKey = btn.dataset.inco;
+  document.getElementById('inco-explainer').textContent = INCO_TEXT[selIncoKey];
+}
+
+function selDest(btn) {
+  document.querySelectorAll('.dest-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  selDestKey = btn.dataset.dest;
+  updateDestPorts();
+  updatePortInfo();
+}
+
+function selFreight(btn) {
+  document.querySelectorAll('.freight-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  selFreightKey = btn.dataset.freight;
+}
+
+function updateDestPorts() {
+  const sel = document.getElementById('dest_port');
+  sel.innerHTML = '';
+  (DEST_PORTS[selDestKey]||[]).forEach(p=>{
+    const o=document.createElement('option');
+    o.value=p.val; o.textContent=p.label;
+    sel.appendChild(o);
+  });
+}
+
+function updatePortInfo() {
+  const op = document.getElementById('origin_port').value;
+  const dest = selDestKey;
+  const r = PORT_FREIGHT[op] ? PORT_FREIGHT[op][dest] : null;
+  if (!r) { document.getElementById('port-info').textContent='Rate data unavailable for this route.'; return; }
+  const ftype = selFreightKey;
+  let rateStr;
+  if (ftype==='lcl') rateStr=`$${r.lcl}/CBM`;
+  else if (ftype==='air') rateStr=`$${r.air}/kg`;
+  else if (ftype==='fcl40') rateStr=`$${r.fcl40.toLocaleString()}/40' container`;
+  else rateStr=`$${r.fcl20.toLocaleString()}/20' container`;
+  document.getElementById('port-info').innerHTML =
+    `<b>Estimated freight:</b> ${rateStr} &nbsp;·&nbsp; <b>Transit:</b> ${r.transit} &nbsp;·&nbsp; <b>Via:</b> ${r.via}`;
+}
+
+document.getElementById('currency').addEventListener('change', function(){
+  const s={USD:'$',EUR:'€',INR:'₹'};
+  document.getElementById('cur-prefix').textContent=s[this.value]||'$';
+});
+
+// ══════════════════════════════════════════════════════════
+// CALCULATE
+// ══════════════════════════════════════════════════════════
+function fmt(n,dp=0){return n.toLocaleString('en-US',{minimumFractionDigits:dp,maximumFractionDigits:dp})}
+function fmtC(n,c='USD'){const s={USD:'$',EUR:'€',INR:'₹'};return (s[c]||'$')+fmt(n)}
+
+function getFreight(originPort, destKey, type, cbm, kg) {
+  const r = PORT_FREIGHT[originPort]?.[destKey];
+  if (!r) return 1000;
+  if (type==='lcl') return r.lcl * Math.max(cbm||1,1);
+  if (type==='air') return r.air * Math.max(kg||100,1);
+  if (type==='fcl40') return r.fcl40;
+  return r.fcl20;
+}
+
+function getHSNDuty(destKey, hsnData, customDutyVal) {
+  if (!isNaN(customDutyVal) && customDutyVal!=='' && document.getElementById('custom_duty').value!=='') return { rate:customDutyVal, source:'manual', notes:'User-entered override' };
+  if (!hsnData) return { rate:getDutyDefault(destKey), source:'estimated', notes:'No HSN entered — using category average. Enter HSN for accuracy.' };
+  const d = hsnData.data;
+  if (destKey==='EU') {
+    const r = (d.EU.gsp !== undefined) ? d.EU.gsp : d.EU.rate;
+    return { rate:r, source:`HSN ${hsnData.key}`, notes:`EU GSP rate for India: ${r}% (MFN: ${d.EU.rate}%)${d.EU.unit?' Note: specific duty ('+d.EU.unit+'). % shown is approximate':'' }` };
+  }
+  if (destKey==='UAE') {
+    const r = (d.UAE.cepa !== undefined) ? d.UAE.cepa : d.UAE.rate;
+    return { rate:r, source:`HSN ${hsnData.key}`, notes:`UAE-India CEPA rate: ${r}% (MFN: ${d.UAE.rate}%)` };
+  }
+  if (destKey==='USA') {
+    return { rate:d.USA.rate, source:`HSN ${hsnData.key}`, notes:`US MFN rate. ${d.USA.notes||'Verify at USITC HTS Online.'}` };
+  }
+  if (destKey==='BD') {
+    return { rate:d.BD.cd, source:`HSN ${hsnData.key}`, notes:`CD: ${d.BD.cd}%${d.BD.sd?' + SD: '+d.BD.sd+'%':''}. Plus VAT 15%, AIT 5%.`, sd: d.BD.sd||0 };
+  }
+  return { rate:10, source:'estimated', notes:'' };
+}
+
+function getDutyDefault(destKey) {
+  return {EU:12,UAE:5,USA:6.5,BD:25}[destKey]||10;
+}
+
+function calculate() {
+  const fob = parseFloat(document.getElementById('fob_value').value)||0;
+  if (!fob||fob<=0){alert('Enter FOB export value');return;}
+  const kg = parseFloat(document.getElementById('weight').value)||500;
+  const cbm = parseFloat(document.getElementById('volume').value)||2.5;
+  const currency = document.getElementById('currency').value;
+  const originPort = document.getElementById('origin_port').value;
+  const destPort = document.getElementById('dest_port').value;
+  const exportCust = parseFloat(document.getElementById('export_customs').value)||0;
+  const thcOrig = parseFloat(document.getElementById('thc_origin').value)||0;
+  const docFees = parseFloat(document.getElementById('doc_fees').value)||0;
+  const insPct = parseFloat(document.getElementById('insurance_pct').value)||0.3;
+  const customFreightRaw = document.getElementById('custom_freight').value;
+  const customFreight = customFreightRaw!=='' ? parseFloat(customFreightRaw) : null;
+  const customDutyRaw = document.getElementById('custom_duty').value;
+  const customDuty = customDutyRaw!=='' ? parseFloat(customDutyRaw) : NaN;
+  const destData = DEST[selDestKey];
+  const destTHC = parseFloat(document.getElementById('dest_thc').value)||destData.defaultDestTHC;
+  const destBkr = parseFloat(document.getElementById('dest_customs').value)||destData.defaultCustBkr;
+
+  // Freight
+  const freight = (customFreight!==null && !isNaN(customFreight)) ? customFreight
+    : getFreight(originPort, selDestKey, selFreightKey, cbm, kg);
+
+  // CIF
+  const cifBase = fob + freight;
+  const insurance = (insPct/100)*cifBase;
+  const cif = cifBase + insurance;
+
+  // Duty
+  const dutyInfo = getHSNDuty(selDestKey, currentHSNData, customDuty);
+  const dutyPct = dutyInfo.rate;
+  const sdPct = dutyInfo.sd||0;
+  const importDuty = (dutyPct/100)*cif;
+  const sdAmount = (sdPct/100)*cif;
+
+  // VAT / taxes
+  const vatPct = destData.vat;
+  const vatBase = cif + importDuty + sdAmount;
+  const vat = (vatPct/100)*vatBase;
+
+  // BD extra: AIT 5%
+  let ait=0;
+  if (selDestKey==='BD') ait = 0.05*cif;
+
+  // USA extra: MPF + HMT
+  let mpf=0, hmt=0;
+  if (selDestKey==='USA') {
+    mpf = Math.min(Math.max(cif*0.003464,27.75),538.40);
+    hmt = cif*0.00125;
+  }
+
+  const totalTax = importDuty + sdAmount + vat + ait + mpf + hmt;
+  const totalLanded = fob + exportCust + thcOrig + docFees + freight + insurance + totalTax + destTHC + destBkr;
+  const overFOB = ((totalLanded-fob)/fob*100).toFixed(1);
+
+  // ── RENDER ─────────────────────────────────────────────
+  const portR = PORT_FREIGHT[originPort]?.[selDestKey]||{};
+  const originPortLabel = document.getElementById('origin_port').selectedOptions[0].text;
+  const destPortLabel = document.getElementById('dest_port').selectedOptions[0]?.text||destData.ports[0];
+
+  document.getElementById('res-meta').textContent =
+    `🇮🇳 ${originPortLabel} → ${destData.flag} ${destPortLabel}  ·  ${selFreightKey.toUpperCase()}  ·  Incoterm: ${selIncoKey}  ·  HSN: ${document.getElementById('hsn_code').value||'—'}`;
+
+  // Port map
+  document.getElementById('port-map-bar').innerHTML = `
+    <div class="pm-node"><div class="pm-icon">🏭</div><div class="pm-name">Factory</div><div class="pm-sub">India</div></div>
+    <div class="pm-line"><div class="pm-dashes"></div><div class="pm-line-label">inland</div></div>
+    <div class="pm-node"><div class="pm-icon">⚓</div><div class="pm-name">${originPortLabel.split(',')[0]}</div><div class="pm-sub">Origin Port</div></div>
+    <div class="pm-line"><div class="pm-dashes"></div><div class="pm-line-label">${portR.transit||'~20 days'} · ${portR.via||'sea'}</div></div>
+    <div class="pm-node"><div class="pm-icon">🚢</div><div class="pm-name">${destPortLabel.split(',')[0]}</div><div class="pm-sub">Dest. Port</div></div>
+    <div class="pm-line"><div class="pm-dashes"></div><div class="pm-line-label">customs + delivery</div></div>
+    <div class="pm-node"><div class="pm-icon">🏪</div><div class="pm-name">Buyer</div><div class="pm-sub">${destData.name}</div></div>
+  `;
+
+  // Summary cards
+  document.getElementById('summary-cards').innerHTML = `
+    <div class="cost-item"><div class="ci-label">FOB Value</div><div class="ci-value">${fmtC(fob,currency)}</div><div class="ci-pct">Your export price</div></div>
+    <div class="cost-item"><div class="ci-label">CIF Value</div><div class="ci-value">${fmtC(cif,currency)}</div><div class="ci-pct">FOB + freight + insurance</div></div>
+    <div class="cost-item"><div class="ci-label">Import Duty + Taxes</div><div class="ci-value">${fmtC(totalTax,currency)}</div><div class="ci-pct">${dutyPct.toFixed(1)}% duty${sdPct?' + SD '+sdPct+'%':''}</div></div>
+    <div class="cost-item"><div class="ci-label">Port Charges</div><div class="ci-value">${fmtC(destTHC+destBkr,currency)}</div><div class="ci-pct">${destData.name} port fees</div></div>
+    <div class="cost-item highlight"><div class="ci-label">Total Landed Cost</div><div class="ci-value">${fmtC(totalLanded,currency)}</div><div class="ci-pct">+${overFOB}% above FOB</div></div>
+  `;
+
+  // Main breakdown
+  const rows = [
+    { label:'FOB Value', note:'Your quoted export price (factory + India overheads)', amt:fob },
+    { label:'Export Customs (CHA Fees)', note:'Customs House Agent charges, India side', amt:exportCust },
+    { label:'Origin THC', note:`Terminal handling at ${originPortLabel.split(',')[0]}`, amt:thcOrig },
+    { label:'Documentation (BL + Cert.)', note:'Bill of Lading, Certificate of Origin, etc.', amt:docFees },
+    { label:`Sea Freight — ${selFreightKey.toUpperCase()}`, note:`${originPortLabel.split(',')[0]} → ${destPortLabel.split(',')[0]} · ${portR.transit||''}`, amt:freight },
+    { label:'Marine Insurance', note:`${insPct}% of CIF value`, amt:insurance },
+    { label:`Import Duty (${dutyPct.toFixed(1)}%)`, note:`${dutyInfo.source} · applied on CIF`, amt:importDuty },
+  ];
+  if (sdAmount>0) rows.push({label:`Supplementary Duty (${sdPct}%)`,note:'BD supplementary duty on CIF',amt:sdAmount});
+  if (vat>0) rows.push({label:`${vatPct===21?'EU VAT':vatPct===5?'UAE VAT / GST':'VAT'} (${vatPct}%)`,note:'Applied on CIF + import duty',amt:vat});
+  if (ait>0) rows.push({label:'AIT — Advance Income Tax (5%)',note:'Bangladesh AIT on CIF value',amt:ait});
+  if (mpf>0) rows.push({label:'USA MPF + HMT',note:'Merchandise Processing Fee + Harbour Maintenance Tax',amt:mpf+hmt});
+  rows.push({label:'Destination THC / Port Handling',note:`${destPortLabel.split(',')[0]} terminal handling charge`,amt:destTHC});
+  rows.push({label:'Import Customs Brokerage',note:`Licensed customs broker at ${destData.name}`,amt:destBkr});
+
+  const tableRows = rows.map(r=>{
+    const pct=(r.amt/totalLanded*100).toFixed(1);
+    return `<div class="bt-row">
+      <div>${r.label}<br><span style="font-size:0.68rem;color:var(--muted)">${r.note}</span></div>
+      <div class="mono tr">${fmtC(r.amt,currency)}</div>
+      <div class="bar-col"><div class="mini-bar"><div class="mini-bar-fill" style="width:${pct}%"></div></div></div>
+      <div class="mono tr" style="color:var(--muted)">${pct}%</div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('breakdown-table').innerHTML = `
+    <div class="bt-row bh"><div>Cost Component</div><div class="tr">Amount (${currency})</div><div class="bar-col">Share</div><div class="tr">% of Total</div></div>
+    ${tableRows}
+    <div class="bt-row bt"><div>TOTAL LANDED COST</div><div class="mono tr">${fmtC(totalLanded,currency)}</div><div></div><div class="mono tr">100%</div></div>
+  `;
+
+  // Duty detail
+  let dutyHtml = `<div class="duty-table" style="margin-bottom:1rem">
+    <div class="dt-row dh"><div>Tax / Levy</div><div class="tr">Rate</div><div class="tr">Base</div><div class="tr">Amount</div><div>Note</div></div>
+    <div class="dt-row"><div>Import Duty</div><div class="mono tr">${dutyPct.toFixed(1)}%</div><div class="mono tr">${fmtC(cif,currency)} CIF</div><div class="mono tr">${fmtC(importDuty,currency)}</div><div style="font-size:0.72rem;color:var(--muted)">${dutyInfo.source}</div></div>`;
+  if (sdAmount>0) dutyHtml+=`<div class="dt-row"><div>Supplementary Duty</div><div class="mono tr">${sdPct}%</div><div class="mono tr">${fmtC(cif,currency)} CIF</div><div class="mono tr">${fmtC(sdAmount,currency)}</div><div style="font-size:0.72rem;color:var(--muted)">BD only</div></div>`;
+  if (vat>0) dutyHtml+=`<div class="dt-row"><div>VAT / GST</div><div class="mono tr">${vatPct}%</div><div class="mono tr">${fmtC(vatBase,currency)} CIF+duty</div><div class="mono tr">${fmtC(vat,currency)}</div><div style="font-size:0.72rem;color:var(--muted)">${selDestKey==='EU'?'Buyer reclaims if VAT registered':selDestKey==='BD'?'BD VAT':'UAE VAT'}</div></div>`;
+  if (ait>0) dutyHtml+=`<div class="dt-row"><div>AIT (Advance Income Tax)</div><div class="mono tr">5%</div><div class="mono tr">${fmtC(cif,currency)} CIF</div><div class="mono tr">${fmtC(ait,currency)}</div><div style="font-size:0.72rem;color:var(--muted)">Bangladesh AIT</div></div>`;
+  if (mpf>0) dutyHtml+=`<div class="dt-row"><div>MPF (Merchandise Processing)</div><div class="mono tr">0.3464%</div><div class="mono tr">${fmtC(cif,currency)} CIF</div><div class="mono tr">${fmtC(mpf,currency)}</div><div style="font-size:0.72rem;color:var(--muted)">Max $538.40</div></div>`;
+  if (hmt>0) dutyHtml+=`<div class="dt-row"><div>HMT (Harbour Maintenance)</div><div class="mono tr">0.125%</div><div class="mono tr">${fmtC(cif,currency)} CIF</div><div class="mono tr">${fmtC(hmt,currency)}</div><div style="font-size:0.72rem;color:var(--muted)">USA sea freight</div></div>`;
+  dutyHtml += `<div class="dt-row" style="background:rgba(14,124,123,0.06);font-weight:600"><div>Total Import Taxes</div><div></div><div></div><div class="mono tr">${fmtC(totalTax,currency)}</div><div style="font-size:0.72rem">${dutyInfo.notes}</div></div>`;
+  dutyHtml += `</div>`;
+
+  // Trade agreement note
+  dutyHtml += `<div style="background:rgba(45,122,79,0.08);border:1px solid rgba(45,122,79,0.25);border-radius:8px;padding:.9rem 1rem;margin-bottom:1rem;font-size:0.8rem;line-height:1.5;color:#1a4a2e">
+    <strong>🤝 Trade Agreement for India → ${destData.name}:</strong> ${destData.gspNote}
+  </div>`;
+
+  document.getElementById('duty-detail-box').innerHTML = dutyHtml;
+
+  // Transit info
+  const td = destData.transitDays[originPort]||22;
+  document.getElementById('transit-box').innerHTML = `
+    <h4>📍 Route & Transit Information</h4>
+    <div class="transit-row"><span>Origin Port</span><span>${originPortLabel}</span></div>
+    <div class="transit-row"><span>Destination Port</span><span>${destPortLabel}</span></div>
+    <div class="transit-row"><span>Via</span><span>${portR.via||'Suez Canal / Transshipment'}</span></div>
+    <div class="transit-row"><span>Transit Time (est.)</span><span>${portR.transit||td+' days'}</span></div>
+    <div class="transit-row"><span>Freight Type</span><span>${selFreightKey.toUpperCase()} · ${fmtC(freight,currency)}</span></div>
+    <div class="transit-row"><span>CIF Value</span><span>${fmtC(cif,currency)}</span></div>
+    <div class="transit-row" style="border-bottom:none"><span>Cost per kg (landed)</span><span>${fmtC(totalLanded/kg,currency)}/kg</span></div>
+  `;
+
+  const panel = document.getElementById('results-panel');
+  panel.classList.add('visible');
+  setTimeout(()=>panel.scrollIntoView({behavior:'smooth',block:'start'}),100);
+}
+
+// ══════════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════════
+updateDestPorts();
+updatePortInfo();
+selInco(document.querySelector('.inco-btn.active'));
+
+// port change also updates freight info
+document.getElementById('origin_port').addEventListener('change', updatePortInfo);
+document.getElementById('dest_port').addEventListener('change', updatePortInfo);
+
+// HSN lookup on Enter
+document.getElementById('hsn_code').addEventListener('keydown', e=>{ if(e.key==='Enter') lookupHSN(); });
+</script>
+</body>
+</html>
